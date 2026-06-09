@@ -2,147 +2,160 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Formulario de Solicitud de Empleo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor y Editor Oficial de Solicitudes</title>
+    
+    <!-- Cargamos SheetJS para procesar el archivo por dentro sin romperlo -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    
+    <!-- Cargamos Canvas-Datagrid que dibuja el Excel de forma idéntica a como es por dentro -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-datagrid/dist/canvas-datagrid.js"></script>
+
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; padding: 30px; margin: 0; }
-        .form-container { max-width: 900px; background: #fff; margin: 0 auto; border: 1px solid #ccc; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 20px; }
-        
-        /* Encabezado */
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #002060; padding-bottom: 15px; margin-bottom: 20px; }
-        .logo-placeholder { font-weight: bold; color: #002060; font-size: 24px; }
-        .title-area { text-align: right; }
-        .title-area h1 { margin: 0; color: #002060; font-size: 22px; }
-        .title-area p { margin: 5px 0 0 0; font-size: 12px; color: #555; font-weight: bold; }
-
-        /* Instrucciones y Secciones */
-        .instructions { font-size: 13px; font-style: italic; margin-bottom: 15px; color: #333; }
-        .section-title { background-color: #002060; color: white; padding: 6px 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 20px; }
-
-        /* Tabla de Formulario Estilo Excel */
-        .form-table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
-        .form-table td { border: 1px solid #000; padding: 6px; font-size: 13px; vertical-align: middle; }
-        
-        /* Etiquetas e Inputs */
-        .label { font-weight: bold; background-color: #f9f9f9; width: 15%; }
-        input[type="text"], input[type="email"], select { width: 100%; border: none; outline: none; background: transparent; font-size: 13px; font-family: inherit; box-sizing: border-box; }
-        input[type="text"]:focus, input[type="email"]:focus { background-color: #f0f7ff; }
-
-        .checkbox-group { display: flex; gap: 10px; align-items: center; }
-        
-        /* Botón Guardar */
-        .btn-container { margin-top: 20px; text-align: right; }
-        .btn-save { background-color: #217346; color: white; border: none; padding: 12px 25px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .btn-save:hover { background-color: #1a5c38; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #top-bar {
+            background-color: #217346; /* El color verde oficial de Excel */
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        #grid-container {
+            flex-content: stretch;
+            flex-grow: 1;
+            background: white;
+            overflow: hidden;
+            position: relative;
+        }
+        .btn {
+            background-color: white;
+            color: #217346;
+            border: none;
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background-color: #e1f5fe;
+        }
+        #file-input {
+            color: white;
+            font-size: 14px;
+        }
+        /* Instrucciones flotantes si no hay archivo */
+        #drop-zone-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #666;
+            text-align: center;
+            font-size: 18px;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <div class="header">
-        <div class="logo-placeholder">DP WORLD</div>
-        <div class="title-area">
-            <h1>SOLICITUD DE EMPLEO</h1>
-            <p>HR-AT-FR-005<br>Versión: 1.4</p>
+    <div id="top-bar">
+        <div class="controls">
+            <strong>Visualizador Integrado:</strong>
+            <input type="file" id="file-input" accept=".xlsx, .xls" />
         </div>
+        <button class="btn" id="btn-save" style="display: none;">Guardar y Descargar Excel</button>
     </div>
 
-    <div class="instructions">Lea cuidadosamente siguiendo las instrucciones y conteste de forma clara y precisa</div>
+    <div id="grid-container">
+        <div id="drop-zone-text">Selecciona o arrastra el archivo de Solicitud de Empleo aquí para empezar</div>
+    </div>
 
-    <form id="employment-form">
-        <div class="section-title">Datos Personales</div>
-        <table class="form-table">
-            <tr>
-                <td class="label">Nombres:</td>
-                <td colspan="3"><input type="text" name="nombres" required></td>
-                <td rowspan="5" style="width: 20%; text-align: center; font-weight: bold; color: #777; background: #fafafa;">Foto</td>
-            </tr>
-            <tr>
-                <td class="label">Apellidos:</td>
-                <td colspan="3"><input type="text" name="apellidos" required></td>
-            </tr>
-            <tr>
-                <td class="label">F. Nacimiento:</td>
-                <td><input type="text" placeholder="DD/MM/AAAA" name="fecha_nacimiento"></td>
-                <td class="label" style="width: 10%;">Edad:</td>
-                <td><input type="text" name="edad"></td>
-            </tr>
-            <tr>
-                <td class="label">Lugar Nac.:</td>
-                <td><input type="text" name="lugar_nacimiento"></td>
-                <td class="label">Nacionalidad:</td>
-                <td><input type="text" name="nacionalidad"></td>
-            </tr>
-            <tr>
-                <td class="label">Cédula / Pas.:</td>
-                <td colspan="3"><input type="text" name="cedula"></td>
-            </tr>
-            <tr>
-                <td class="label">Estado Civil:</td>
-                <td colspan="4">
-                    <div class="checkbox-group">
-                        <label><input type="radio" name="estado_civil" value="Soltero"> Soltero</label>
-                        <label><input type="radio" name="estado_civil" value="Casado"> Casado</label>
-                        <label><input type="radio" name="estado_civil" value="Divorciado"> Divorciado</label>
-                        <label><input type="radio" name="estado_civil" value="Viudo"> Viudo</label>
-                        <label><input type="radio" name="estado_civil" value="Union Libre"> Unión Libre</label>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td class="label">Género:</td>
-                <td>
-                    <div class="checkbox-group">
-                        <label><input type="radio" name="genero" value="Masculino"> M</label>
-                        <label><input type="radio" name="genero" value="Femenino"> F</label>
-                    </div>
-                </td>
-                <td class="label">Correo:</td>
-                <td colspan="2"><input type="email" name="correo"></td>
-            </tr>
-            <tr>
-                <td class="label">Teléfono:</td>
-                <td><input type="text" name="telefono"></td>
-                <td class="label">Celular:</td>
-                <td colspan="2"><input type="text" name="celular"></td>
-            </tr>
-        </table>
+    <script>
+        let grid;
+        let originalWorkbook;
+        let activeSheetName;
 
-        <div class="section-title">Dirección de Domicilio</div>
-        <table class="form-table">
-            <tr>
-                <td class="label">Urbanización:</td>
-                <td><input type="text" name="urbanizacion"></td>
-                <td class="label" style="width: 10%;">Manzana:</td>
-                <td><input type="text" name="manzana"></td>
-                <td class="label" style="width: 15%;">Villa/Depto:</td>
-                <td><input type="text" name="villa_depto"></td>
-            </tr>
-            <tr>
-                <td class="label">Ciudad:</td>
-                <td><input type="text" name="ciudad"></td>
-                <td class="label">Sector:</td>
-                <td><input type="text" name="sector"></td>
-                <td class="label">Parroquia:</td>
-                <td><input type="text" name="parroquia"></td>
-            </tr>
-        </table>
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        <div class="btn-container">
-            <button type="button" class="btn-save" onclick="guardarFormulario()">Guardar Datos</button>
-        </div>
-    </form>
-</div>
+            // Ocultar texto de ayuda
+            document.getElementById('drop-zone-text').style.display = 'none';
 
-<script>
-    function guardarFormulario() {
-        // Captura todos los datos del formulario de manera limpia
-        const formData = new FormData(document.getElementById('employment-form'));
-        const datos = Object.fromEntries(formData.entries());
-        
-        console.log("Datos listos para enviar o almacenar:", datos);
-        alert("¡Datos procesados con éxito! Revisa la consola web.");
-    }
-</script>
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const data = new Uint8Array(evt.target.result);
+                
+                // Leer el archivo conservando los estilos internos, celdas y estructuras
+                originalWorkbook = XLSX.read(data, {type: 'array', cellStyles: true, cellNF: true});
+                activeSheetName = originalWorkbook.SheetNames[0];
+                
+                // Convertir la estructura interna a un formato plano que entienda el visor web
+                const worksheet = originalWorkbook.Sheets[activeSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
 
+                // Inicializar o actualizar el visor gráfico
+                renderGrid(jsonData);
+                
+                // Mostrar botón de guardado
+                document.getElementById('btn-save').style.display = 'block';
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function renderGrid(data) {
+            const container = document.getElementById('grid-container');
+            
+            // Si ya existía una vista previa la limpiamos
+            container.innerHTML = '';
+
+            // Crear el visor interactivo de celdas
+            grid = canvasDatagrid({
+                parentNode: container,
+                data: data,
+                allowGridEditing: true, // Permitir que hagas clic y edites directamente
+                borderDragBehavior: 'move',
+                allowColumnReordering: false,
+                allowRowReordering: false
+            });
+
+            // Forzar a que ocupe todo el tamaño de la pantalla web
+            grid.style.width = '100%';
+            grid.style.height = '100%';
+        }
+
+        // Evento para guardar los cambios de vuelta al archivo original
+        document.getElementById('btn-save').addEventListener('click', function() {
+            if (!grid || !originalWorkbook) return;
+
+            // 1. Obtener los datos modificados desde la pantalla web
+            const editedData = grid.data;
+
+            // 2. Convertir los datos de vuelta al formato de Hoja de Excel
+            const newWorksheet = XLSX.utils.aoa_to_sheet(editedData);
+
+            // 3. Reemplazar la hoja vieja con la nueva editada manteniendo la estructura intacta
+            originalWorkbook.Sheets[activeSheetName] = newWorksheet;
+
+            // 4. Generar la descarga del archivo modificado
+            XLSX.writeFile(originalWorkbook, "HR-AT-FR-005_Solicitud_Modificada.xlsx");
+        });
+    </script>
 </body>
 </html>
