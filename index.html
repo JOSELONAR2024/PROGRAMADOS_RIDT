@@ -2,87 +2,147 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor y Editor de Solicitud de Empleo</title>
-    
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/css/pluginsCss.css' />
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/plugins.css' />
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/css/luckysheet.css' />
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/luckysheet/dist/assets/iconfont/iconfont.css' />
-    
-    <script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/plugins/js/plugin.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luckysheet/dist/luckysheet.umd.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/luckyexcel/dist/luckyexcel.umd.js"></script>
-
+    <title>Formulario de Solicitud de Empleo</title>
     <style>
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f5f7; }
-        #header-bar { padding: 10px 20px; background: #217346; color: white; display: flex; align-items: center; gap: 15px; }
-        #lucky-container { margin: 0; width: 100%; height: calc(100vh - 60px); left: 0px; top: 0px; }
-        .btn { background: #ffffff; color: #217346; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .btn:hover { background: #e2e2e2; }
-        #file-input { color: white; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; padding: 30px; margin: 0; }
+        .form-container { max-width: 900px; background: #fff; margin: 0 auto; border: 1px solid #ccc; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 20px; }
+        
+        /* Encabezado */
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #002060; padding-bottom: 15px; margin-bottom: 20px; }
+        .logo-placeholder { font-weight: bold; color: #002060; font-size: 24px; }
+        .title-area { text-align: right; }
+        .title-area h1 { margin: 0; color: #002060; font-size: 22px; }
+        .title-area p { margin: 5px 0 0 0; font-size: 12px; color: #555; font-weight: bold; }
+
+        /* Instrucciones y Secciones */
+        .instructions { font-size: 13px; font-style: italic; margin-bottom: 15px; color: #333; }
+        .section-title { background-color: #002060; color: white; padding: 6px 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; margin-top: 20px; }
+
+        /* Tabla de Formulario Estilo Excel */
+        .form-table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
+        .form-table td { border: 1px solid #000; padding: 6px; font-size: 13px; vertical-align: middle; }
+        
+        /* Etiquetas e Inputs */
+        .label { font-weight: bold; background-color: #f9f9f9; width: 15%; }
+        input[type="text"], input[type="email"], select { width: 100%; border: none; outline: none; background: transparent; font-size: 13px; font-family: inherit; box-sizing: border-box; }
+        input[type="text"]:focus, input[type="email"]:focus { background-color: #f0f7ff; }
+
+        .checkbox-group { display: flex; gap: 10px; align-items: center; }
+        
+        /* Botón Guardar */
+        .btn-container { margin-top: 20px; text-align: right; }
+        .btn-save { background-color: #217346; color: white; border: none; padding: 12px 25px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-save:hover { background-color: #1a5c38; }
     </style>
 </head>
 <body>
 
-    <div id="header-bar">
-        <strong style="font-size: 1.1em;">Editor de Formulario:</strong>
-        <input type="file" id="file-input" accept=".xlsx" />
-        <button class="btn" id="export-btn">Descargar Excel Editado</button>
+<div class="form-container">
+    <div class="header">
+        <div class="logo-placeholder">DP WORLD</div>
+        <div class="title-area">
+            <h1>SOLICITUD DE EMPLEO</h1>
+            <p>HR-AT-FR-005<br>Versión: 1.4</p>
+        </div>
     </div>
 
-    <div id="lucky-container"></div>
+    <div class="instructions">Lea cuidadosamente siguiendo las instrucciones y conteste de forma clara y precisa</div>
 
-    <script>
-        let currentFileName = "Solicitud_Empleo_Editada.xlsx";
+    <form id="employment-form">
+        <div class="section-title">Datos Personales</div>
+        <table class="form-table">
+            <tr>
+                <td class="label">Nombres:</td>
+                <td colspan="3"><input type="text" name="nombres" required></td>
+                <td rowspan="5" style="width: 20%; text-align: center; font-weight: bold; color: #777; background: #fafafa;">Foto</td>
+            </tr>
+            <tr>
+                <td class="label">Apellidos:</td>
+                <td colspan="3"><input type="text" name="apellidos" required></td>
+            </tr>
+            <tr>
+                <td class="label">F. Nacimiento:</td>
+                <td><input type="text" placeholder="DD/MM/AAAA" name="fecha_nacimiento"></td>
+                <td class="label" style="width: 10%;">Edad:</td>
+                <td><input type="text" name="edad"></td>
+            </tr>
+            <tr>
+                <td class="label">Lugar Nac.:</td>
+                <td><input type="text" name="lugar_nacimiento"></td>
+                <td class="label">Nacionalidad:</td>
+                <td><input type="text" name="nacionalidad"></td>
+            </tr>
+            <tr>
+                <td class="label">Cédula / Pas.:</td>
+                <td colspan="3"><input type="text" name="cedula"></td>
+            </tr>
+            <tr>
+                <td class="label">Estado Civil:</td>
+                <td colspan="4">
+                    <div class="checkbox-group">
+                        <label><input type="radio" name="estado_civil" value="Soltero"> Soltero</label>
+                        <label><input type="radio" name="estado_civil" value="Casado"> Casado</label>
+                        <label><input type="radio" name="estado_civil" value="Divorciado"> Divorciado</label>
+                        <label><input type="radio" name="estado_civil" value="Viudo"> Viudo</label>
+                        <label><input type="radio" name="estado_civil" value="Union Libre"> Unión Libre</label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Género:</td>
+                <td>
+                    <div class="checkbox-group">
+                        <label><input type="radio" name="genero" value="Masculino"> M</label>
+                        <label><input type="radio" name="genero" value="Femenino"> F</label>
+                    </div>
+                </td>
+                <td class="label">Correo:</td>
+                <td colspan="2"><input type="email" name="correo"></td>
+            </tr>
+            <tr>
+                <td class="label">Teléfono:</td>
+                <td><input type="text" name="telefono"></td>
+                <td class="label">Celular:</td>
+                <td colspan="2"><input type="text" name="celular"></td>
+            </tr>
+        </table>
 
-        // Inicializar Luckysheet vacío al arrancar
-        window.onload = function() {
-            luckysheet.create({
-                container: 'lucky-container',
-                lang: 'es',
-                showinfobar: false
-            });
-        };
+        <div class="section-title">Dirección de Domicilio</div>
+        <table class="form-table">
+            <tr>
+                <td class="label">Urbanización:</td>
+                <td><input type="text" name="urbanizacion"></td>
+                <td class="label" style="width: 10%;">Manzana:</td>
+                <td><input type="text" name="manzana"></td>
+                <td class="label" style="width: 15%;">Villa/Depto:</td>
+                <td><input type="text" name="villa_depto"></td>
+            </tr>
+            <tr>
+                <td class="label">Ciudad:</td>
+                <td><input type="text" name="ciudad"></td>
+                <td class="label">Sector:</td>
+                <td><input type="text" name="sector"></td>
+                <td class="label">Parroquia:</td>
+                <td><input type="text" name="parroquia"></td>
+            </tr>
+        </table>
 
-        // Procesar la carga del archivo Excel real
-        document.getElementById('file-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            currentFileName = file.name;
+        <div class="btn-container">
+            <button type="button" class="btn-save" onclick="guardarFormulario()">Guardar Datos</button>
+        </div>
+    </form>
+</div>
 
-            Luckyexcel.transformExcelToLucky(file, function(exportJson, luckysheetHtml) {
-                if (exportJson.sheets == null || exportJson.sheets.length == 0) {
-                    alert("No se pudo leer el archivo de Excel correctamente.");
-                    return;
-                }
-                
-                // Destruir e inicializar Luckysheet con el diseño original del archivo
-                luckysheet.destroy();
-                luckysheet.create({
-                    container: 'lucky-container',
-                    lang: 'es',
-                    showinfobar: false,
-                    allowUpdate: true,
-                    data: exportJson.sheets,
-                    title: exportJson.info.name
-                });
-            });
-        });
+<script>
+    function guardarFormulario() {
+        // Captura todos los datos del formulario de manera limpia
+        const formData = new FormData(document.getElementById('employment-form'));
+        const datos = Object.fromEntries(formData.entries());
+        
+        console.log("Datos listos para enviar o almacenar:", datos);
+        alert("¡Datos procesados con éxito! Revisa la consola web.");
+    }
+</script>
 
-        // Guardar y descargar el archivo con los cambios realizados
-        document.getElementById('export-btn').addEventListener('click', function() {
-            // Nota: Para exportar de vuelta a un archivo .xlsx nativo manteniendo el 100% de los estilos 
-            // avanzados de Luckysheet de forma local, se suele usar la extensión de exportación.
-            // Esta función genera el objeto de datos actual.
-            const sheets = luckysheet.getluckysheetfile();
-            
-            // Para fines prácticos e inmediatos en el navegador de manera local sin servidores complejos:
-            alert("¡Cambios listos en la interfaz! Para un entorno de producción que guarde el archivo .xlsx exactamente igual con imágenes pesadas en el disco, Luckysheet envía este JSON resultante al backend.");
-            console.log(sheets); 
-        });
-    </script>
 </body>
 </html>
